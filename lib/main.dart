@@ -34,7 +34,16 @@ class MyHomePage extends StatelessWidget {
       body: const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[Text('Welcome to Myths Flutter App!')],
+          children: <Widget>[
+            const Text(
+              'Welcome to Myths Flutter App!',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.deepPurple,
+              ),
+            ),
+          ],
         ),
       ),
     );
