@@ -53,6 +53,9 @@ class _OrderScreenState extends State<OrderScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isAddDisabled = _quantity >= widget.maxQuantity;
+    final isRemoveDisabled = _quantity <= 0;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Sandwich Counter')),
       body: Center(
@@ -64,11 +67,48 @@ class _OrderScreenState extends State<OrderScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                  onPressed: _increaseQuantity,
+                  onPressed: isAddDisabled ? null : _increaseQuantity,
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.resolveWith<Color>((
+                      states,
+                    ) {
+                      if (states.contains(MaterialState.disabled)) {
+                        return Colors.grey;
+                      }
+                      return Colors.lightGreenAccent;
+                    }),
+                    foregroundColor: MaterialStateProperty.resolveWith<Color>((
+                      states,
+                    ) {
+                      if (states.contains(MaterialState.disabled)) {
+                        return Colors.black54;
+                      }
+                      return Colors.white;
+                    }),
+                  ),
                   child: const Text('Add'),
                 ),
+                const SizedBox(width: 12),
                 ElevatedButton(
-                  onPressed: _decreaseQuantity,
+                  onPressed: isRemoveDisabled ? null : _decreaseQuantity,
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.resolveWith<Color>((
+                      states,
+                    ) {
+                      if (states.contains(MaterialState.disabled)) {
+                        return Colors.grey;
+                      }
+                      return Colors.red;
+                    }),
+                    foregroundColor: MaterialStateProperty.resolveWith<Color>((
+                      states,
+                    ) {
+                      if (states.contains(MaterialState.disabled)) {
+                        return Colors.black54;
+                      }
+                      return Colors.white;
+                    }),
+                  ),
                   child: const Text('Remove'),
                 ),
               ],
