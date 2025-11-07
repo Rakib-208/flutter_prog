@@ -11,7 +11,7 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Sandwich Shop App',
-      home: OrderScreen(maxQuantity: 5),
+      home: OrderScreen(maxQuantity: 6),
     );
   }
 }
@@ -69,18 +69,18 @@ class _OrderScreenState extends State<OrderScreen> {
                 ElevatedButton(
                   onPressed: isAddDisabled ? null : _increaseQuantity,
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.resolveWith<Color>((
+                    backgroundColor: WidgetStateProperty.resolveWith<Color>((
                       states,
                     ) {
-                      if (states.contains(MaterialState.disabled)) {
+                      if (states.contains(WidgetState.disabled)) {
                         return Colors.grey;
                       }
                       return Colors.lightGreenAccent;
                     }),
-                    foregroundColor: MaterialStateProperty.resolveWith<Color>((
+                    foregroundColor: WidgetStateProperty.resolveWith<Color>((
                       states,
                     ) {
-                      if (states.contains(MaterialState.disabled)) {
+                      if (states.contains(WidgetState.disabled)) {
                         return Colors.black54;
                       }
                       return Colors.white;
@@ -92,18 +92,18 @@ class _OrderScreenState extends State<OrderScreen> {
                 ElevatedButton(
                   onPressed: isRemoveDisabled ? null : _decreaseQuantity,
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.resolveWith<Color>((
+                    backgroundColor: WidgetStateProperty.resolveWith<Color>((
                       states,
                     ) {
-                      if (states.contains(MaterialState.disabled)) {
+                      if (states.contains(WidgetState.disabled)) {
                         return Colors.grey;
                       }
                       return Colors.red;
                     }),
-                    foregroundColor: MaterialStateProperty.resolveWith<Color>((
+                    foregroundColor: WidgetStateProperty.resolveWith<Color>((
                       states,
                     ) {
-                      if (states.contains(MaterialState.disabled)) {
+                      if (states.contains(WidgetState.disabled)) {
                         return Colors.black54;
                       }
                       return Colors.white;
