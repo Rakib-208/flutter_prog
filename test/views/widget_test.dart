@@ -97,13 +97,24 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(const App());
-      expect(find.text('0 footlong sandwich(es): '), findsOneWidget);
-      await tester.tap(find.byType(Switch));
+      expect(find.text('0 white footlong sandwich(es): '), findsOneWidget);
+      await tester.tap(find.byKey(const Key('size_switch')));
       await tester.pump();
-      expect(find.text('0 six-inch sandwich(es): '), findsOneWidget);
-      await tester.tap(find.byType(Switch));
+      expect(find.text('0 white six-inch sandwich(es): '), findsOneWidget);
+      await tester.tap(find.byKey(const Key('size_switch')));
       await tester.pump();
-      expect(find.text('0 footlong sandwich(es): '), findsOneWidget);
+      expect(find.text('0 white footlong sandwich(es): '), findsOneWidget);
+    });
+
+    testWidgets('toggles toasted state via Switch', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(const App());
+      expect(find.byKey(const Key('toasted_switch')), findsOneWidget);
+      await tester.tap(find.byKey(const Key('toasted_switch')));
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('toasted_switch')));
+      await tester.pump();
     });
   });
 

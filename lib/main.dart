@@ -120,6 +120,7 @@ class _OrderScreenState extends State<OrderScreen> {
   final TextEditingController _notesController = TextEditingController();
   bool _isFootlong = true;
   BreadType _selectedBreadType = BreadType.white;
+  bool _isToasted = false; // added
 
   @override
   void initState() {
@@ -203,8 +204,25 @@ class _OrderScreenState extends State<OrderScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text('six-inch', style: normalText),
-                Switch(value: _isFootlong, onChanged: _onSandwichTypeChanged),
+                Switch(
+                  key: const Key('size_switch'), // added key
+                  value: _isFootlong,
+                  onChanged: _onSandwichTypeChanged,
+                ),
                 const Text('footlong', style: normalText),
+              ],
+            ),
+            Row(
+              // new toasted switch row
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('untoasted', style: normalText),
+                Switch(
+                  key: const Key('toasted_switch'),
+                  value: _isToasted,
+                  onChanged: (value) => setState(() => _isToasted = value),
+                ),
+                const Text('toasted', style: normalText),
               ],
             ),
             const SizedBox(height: 10),
