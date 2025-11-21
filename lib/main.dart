@@ -213,7 +213,7 @@ class _OrderScreenState extends State<OrderScreen> {
               ],
             ),
             Row(
-              // new toasted switch row
+              //toast
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text('untoasted', style: normalText),
