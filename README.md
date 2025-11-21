@@ -148,12 +148,6 @@ Follow:
 
 ## Contact
 
-Author: Your Name  
-Email: your.email@example.com  
-GitHub: https://github.com/your-username  
-LinkedIn: https://www.linkedin.com/in/your-profile
-
-(Replace placeholders.)
-
----
-Happy coding!
+Author: MD RAKIB  
+Email: ra.hasan3210@gamil.com 
+GitHub: https://github.com/Rakib-208 
