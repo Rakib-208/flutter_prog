@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_prog/views/app_styles.dart';
+import 'package:flutter_prog/repositories/order_repository.dart';
+
+// Added BreadType enum (fix for breadType errors)
+enum BreadType { white, wheat, multigrain, rye }
 
 void main() {
   runApp(const App());
@@ -19,8 +24,11 @@ class App extends StatelessWidget {
 class OrderItemDisplay extends StatelessWidget {
   final int quantity;
   final String itemType;
+  final BreadType breadType; // added
+  final String orderNote; // added
   // Centralized reusable button styles
-  static ButtonStyle _buildStyle({
+  static ButtonStyle _buildStyledButton({
+    // renamed from _buildStyle
     required Color activeBg,
     required Color activeFg,
     required Color disabledBg,
@@ -28,11 +36,13 @@ class OrderItemDisplay extends StatelessWidget {
   }) {
     return ButtonStyle(
       backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
-        if (states.contains(WidgetState.disabled)) return disabledBg;
+        // fixed
+        if (states.contains(WidgetState.disabled)) return disabledBg; // fixed
         return activeBg;
       }),
       foregroundColor: WidgetStateProperty.resolveWith<Color>((states) {
-        if (states.contains(WidgetState.disabled)) return disabledFg;
+        // fixed
+        if (states.contains(WidgetState.disabled)) return disabledFg; // fixed
         return activeFg;
       }),
       padding: WidgetStateProperty.all(
@@ -42,39 +52,57 @@ class OrderItemDisplay extends StatelessWidget {
         RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
       elevation: WidgetStateProperty.resolveWith<double>((states) {
-        if (states.contains(WidgetState.disabled)) return 0;
-        if (states.contains(WidgetState.pressed)) return 2;
+        // fixed
+        if (states.contains(WidgetState.disabled)) return 0; // fixed
+        if (states.contains(WidgetState.pressed)) return 2; // fixed
         return 4;
       }),
     );
   }
 
-  static final ButtonStyle addButtonStyle = _buildStyle(
+  static final ButtonStyle addStyledButton = _buildStyledButton(
+    // renamed
     activeBg: Colors.green.shade800,
     activeFg: Colors.white,
     disabledBg: Colors.grey,
     disabledFg: Colors.black54,
   );
 
-  static final ButtonStyle removeButtonStyle = _buildStyle(
+  static final ButtonStyle removeStyledButton = _buildStyledButton(
+    // renamed
     activeBg: Colors.red,
     activeFg: Colors.white,
     disabledBg: Colors.grey,
     disabledFg: Colors.black54,
   );
 
-  static final ButtonStyle backButtonStyle = _buildStyle(
+  static final ButtonStyle backStyledButton = _buildStyledButton(
+    // renamed
     activeBg: Colors.blue,
     activeFg: Colors.white,
     disabledBg: Colors.blueGrey,
     disabledFg: Colors.white70,
   );
 
-  const OrderItemDisplay(this.quantity, this.itemType, {super.key});
+  const OrderItemDisplay({
+    super.key,
+    required this.quantity,
+    required this.itemType,
+    required this.breadType,
+    required this.orderNote,
+  }); // changed to named params
 
   @override
   Widget build(BuildContext context) {
-    return Text('$quantity $itemType sandwich(es): ${'🥪' * quantity}');
+    final sandwiches = '🥪' * quantity;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text('$quantity $itemType sandwich(es): $sandwiches'),
+        Text('Bread: ${breadType.name}'),
+        Text('Note: $orderNote'),
+      ],
+    );
   }
 }
 
@@ -88,120 +116,169 @@ class OrderScreen extends StatefulWidget {
 }
 
 class _OrderScreenState extends State<OrderScreen> {
-  int _quantity = 0;
-  String? _selectedItemType; // newly added
+  late final OrderRepository _orderRepository;
+  final TextEditingController _notesController = TextEditingController();
+  bool _isFootlong = true;
+  BreadType _selectedBreadType = BreadType.white;
 
-  void _select(String type) {
-    setState(() {
-      _selectedItemType = type;
-      _quantity = 0; // reset counter on selection
+  @override
+  void initState() {
+    super.initState();
+    _orderRepository = OrderRepository(maxQuantity: widget.maxQuantity);
+    _notesController.addListener(() {
+      setState(() {});
     });
   }
 
-  void _clearSelection() {
-    // added
-    setState(() {
-      _selectedItemType = null;
-      _quantity = 0;
-    });
+  @override
+  void dispose() {
+    _notesController.dispose();
+    super.dispose();
   }
 
-  void _increaseQuantity() {
-    if (_quantity < widget.maxQuantity) {
-      setState(() => _quantity++);
+  VoidCallback? _getIncreaseCallback() {
+    if (_orderRepository.canIncrement) {
+      return () => setState(_orderRepository.increment);
+    }
+    return null;
+  }
+
+  VoidCallback? _getDecreaseCallback() {
+    if (_orderRepository.canDecrement) {
+      return () => setState(_orderRepository.decrement);
+    }
+    return null;
+  }
+
+  void _onSandwichTypeChanged(bool value) {
+    setState(() => _isFootlong = value);
+  }
+
+  void _onBreadTypeSelected(BreadType? value) {
+    if (value != null) {
+      setState(() => _selectedBreadType = value);
     }
   }
 
-  void _decreaseQuantity() {
-    if (_quantity > 0) {
-      setState(() => _quantity--);
+  List<DropdownMenuEntry<BreadType>> _buildDropdownEntries() {
+    List<DropdownMenuEntry<BreadType>> entries = [];
+    for (BreadType bread in BreadType.values) {
+      DropdownMenuEntry<BreadType> newEntry = DropdownMenuEntry<BreadType>(
+        value: bread,
+        label: bread.name,
+      );
+      entries.add(newEntry);
     }
+    return entries;
   }
 
   @override
   Widget build(BuildContext context) {
-    final isAddDisabled = _quantity >= widget.maxQuantity;
-    final isRemoveDisabled = _quantity <= 0;
+    String sandwichType = 'footlong';
+    if (!_isFootlong) {
+      sandwichType = 'six-inch';
+    }
+
+    String noteForDisplay;
+    if (_notesController.text.isEmpty) {
+      noteForDisplay = 'No notes added.';
+    } else {
+      noteForDisplay = _notesController.text;
+    }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Sandwich Counter')),
+      appBar: AppBar(title: const Text('Sandwich Counter', style: heading1)),
       body: Center(
-        child: _selectedItemType == null
-            ? Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    onPressed: () => _select('Footlong'),
-                    child: const Text('Footlong Sandwich'),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => _select('Six-inch'),
-                    child: const Text('Six-Inch Sandwich'),
-                  ),
-                ],
-              )
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  OrderItemDisplay(_quantity, _selectedItemType!),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ElevatedButton(
-                        onPressed: isAddDisabled ? null : _increaseQuantity,
-                        style: ButtonStyle(
-                          backgroundColor:
-                              WidgetStateProperty.resolveWith<Color>((states) {
-                                if (states.contains(WidgetState.disabled)) {
-                                  return Colors.grey;
-                                }
-                                return Colors.green[800]!;
-                              }),
-                          foregroundColor:
-                              WidgetStateProperty.resolveWith<Color>((states) {
-                                if (states.contains(WidgetState.disabled)) {
-                                  return Colors.black54;
-                                }
-                                return Colors.white;
-                              }),
-                        ),
-                        child: const Text('Add'),
-                      ),
-                      const SizedBox(width: 12),
-                      ElevatedButton(
-                        onPressed: isRemoveDisabled ? null : _decreaseQuantity,
-                        style: ButtonStyle(
-                          backgroundColor:
-                              WidgetStateProperty.resolveWith<Color>((states) {
-                                if (states.contains(WidgetState.disabled)) {
-                                  return Colors.grey;
-                                }
-                                return Colors.red;
-                              }),
-                          foregroundColor:
-                              WidgetStateProperty.resolveWith<Color>((states) {
-                                if (states.contains(WidgetState.disabled)) {
-                                  return Colors.black54;
-                                }
-                                return Colors.white;
-                              }),
-                        ),
-                        child: const Text('Remove'),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: _clearSelection,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: const Text('Back'),
-                  ),
-                ],
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            OrderItemDisplay(
+              quantity: _orderRepository.quantity,
+              itemType: sandwichType,
+              breadType: _selectedBreadType,
+              orderNote: noteForDisplay,
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('six-inch', style: normalText),
+                Switch(value: _isFootlong, onChanged: _onSandwichTypeChanged),
+                const Text('footlong', style: normalText),
+              ],
+            ),
+            const SizedBox(height: 10),
+            DropdownMenu<BreadType>(
+              textStyle: normalText,
+              initialSelection: _selectedBreadType,
+              onSelected: _onBreadTypeSelected,
+              dropdownMenuEntries: _buildDropdownEntries(),
+            ),
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.all(40.0),
+              child: TextField(
+                key: const Key('notes_textfield'),
+                controller: _notesController,
+                decoration: const InputDecoration(
+                  labelText: 'Add a note (e.g., no onions)',
+                ),
               ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                StyledButton(
+                  onPressed: _getIncreaseCallback(),
+                  icon: Icons.add,
+                  label: 'Add',
+                  backgroundColor: Colors.green,
+                ),
+                const SizedBox(width: 8),
+                StyledButton(
+                  onPressed: _getDecreaseCallback(),
+                  icon: Icons.remove,
+                  label: 'Remove',
+                  backgroundColor: Colors.red,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Added StyledButton widget (fix for StyledButton errors)
+class StyledButton extends StatelessWidget {
+  final VoidCallback? onPressed;
+  final IconData icon;
+  final String label;
+  final Color backgroundColor;
+  final Color foregroundColor;
+  const StyledButton({
+    super.key,
+    required this.onPressed,
+    required this.icon,
+    required this.label,
+    required this.backgroundColor,
+    this.foregroundColor = Colors.white,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton.icon(
+      onPressed: onPressed,
+      icon: Icon(icon),
+      label: Text(label),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: backgroundColor,
+        foregroundColor: foregroundColor,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        elevation: onPressed == null ? 0 : 4,
       ),
     );
   }
