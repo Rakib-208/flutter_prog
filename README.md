@@ -29,7 +29,7 @@ A simple Flutter application simulating a sandwich ordering interface. Users can
 
 ### Clone Repository
 ```bash
-git clone https://github.com/your-username/flutter_prog.git
+git clone https://github.com/Rakib-208/flutter_prog.git
 cd flutter_prog
 ```
 
@@ -64,14 +64,6 @@ To change max quantity:
 ```dart
 home: OrderScreen(maxQuantity: 10)
 ```
-
-### Screenshots (place assets under `assets/screenshots/`)
-![Home Screen](assets/screenshots/home.png)
-![Bread Selection](assets/screenshots/bread_dropdown.png)
-![Quantity Updated](assets/screenshots/quantity.png)
-
-(Replace with real images.)
-
 ## Project Structure
 
 ```
@@ -88,7 +80,6 @@ test/
 - OrderRepository: Encapsulates quantity logic (increment/decrement with guards).
 - OrderScreen: Stateful UI managing user interactions.
 - OrderItemDisplay: Displays order summary details.
-- StyledButton: Reusable elevated button with icon + label.
 
 ### Technologies & Tools
 - Flutter (Material)
@@ -107,45 +98,6 @@ Run all:
 ```bash
 flutter test
 ```
-
-## Known Issues / Limitations
-
-- No backend persistence (in-memory only).
-- Enum bread names are raw (could be localized).
-- No accessibility audit (e.g., semantics).
-- StyledButton styles partially duplicated (could refactor with shared theme).
-
-## Future Improvements
-
-- Persist orders (sqflite / hive / cloud).
-- Add ingredient customization modal.
-- Dark mode theming.
-- Localization (intl).
-- State management (Provider / Riverpod).
-- CI pipeline (GitHub Actions).
-
-## Contributing
-
-1. Fork repository.
-2. Create feature branch:
-   ```bash
-   git checkout -b feature/your-feature
-   ```
-3. Commit changes:
-   ```bash
-   git commit -m "Add feature"
-   ```
-4. Push:
-   ```bash
-   git push origin feature/your-feature
-   ```
-5. Open Pull Request.
-
-Follow:
-- Meaningful commit messages.
-- Include tests for new logic.
-- Run `flutter analyze` before PR.
-
 ## Contact
 
 Author: MD RAKIB  

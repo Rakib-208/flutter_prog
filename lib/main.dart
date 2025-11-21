@@ -26,6 +26,7 @@ class OrderItemDisplay extends StatelessWidget {
   final String itemType;
   final BreadType breadType; // added
   final String orderNote; // added
+  final bool isToasted; // added
   // Centralized reusable button styles
   static ButtonStyle _buildStyledButton({
     // renamed from _buildStyle
@@ -90,6 +91,7 @@ class OrderItemDisplay extends StatelessWidget {
     required this.itemType,
     required this.breadType,
     required this.orderNote,
+    this.isToasted = false, // added default
   }); // changed to named params
 
   @override
@@ -101,6 +103,7 @@ class OrderItemDisplay extends StatelessWidget {
         Text('$quantity $itemType sandwich(es): $sandwiches'),
         Text('Bread: ${breadType.name}'),
         Text('Note: $orderNote'),
+        Text(isToasted ? 'Toasted' : 'Not toasted'), // replaced placeholder
       ],
     );
   }
@@ -198,6 +201,7 @@ class _OrderScreenState extends State<OrderScreen> {
               itemType: sandwichType,
               breadType: _selectedBreadType,
               orderNote: noteForDisplay,
+              isToasted: _isToasted, // pass toasted state
             ),
             const SizedBox(height: 20),
             Row(

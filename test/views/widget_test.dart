@@ -115,6 +115,7 @@ void main() {
       await tester.pump();
       await tester.tap(find.byKey(const Key('toasted_switch')));
       await tester.pump();
+      
     });
   });
 
