@@ -103,7 +103,7 @@ class OrderItemDisplay extends StatelessWidget {
         Text('$quantity $itemType sandwich(es): $sandwiches'),
         Text('Bread: ${breadType.name}'),
         Text('Note: $orderNote'),
-        Text(isToasted ? 'Toasted' : 'Not toasted'), // replaced placeholder
+        Text(isToasted ? 'Toasted' : 'Untoasted'), // replaced placeholder
       ],
     );
   }
