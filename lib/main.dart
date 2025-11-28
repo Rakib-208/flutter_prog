@@ -34,7 +34,7 @@ class _OrderScreenState extends State<OrderScreen> {
   BreadType _selectedBreadType = BreadType.white;
   int _quantity = 1;
 
-  // Stores the confirmation message previously added
+  // Temporary confirmation message
   String _uiConfirmationMessage = "";
 
   @override
@@ -68,8 +68,16 @@ class _OrderScreenState extends State<OrderScreen> {
       String confirmationMessage =
           'Added $_quantity $sizeText ${sandwich.name} sandwich(es) on ${_selectedBreadType.name} bread to cart';
 
-      setState(() {
-        _uiConfirmationMessage = confirmationMessage; // update UI
+      // Activate confirmation message
+      setState(() => _uiConfirmationMessage = confirmationMessage);
+
+      // Auto-dismiss after 3 seconds
+      Future.delayed(const Duration(seconds: 3), () {
+        if (mounted) {
+          setState(() {
+            _uiConfirmationMessage = "";
+          });
+        }
       });
 
       debugPrint(confirmationMessage);
@@ -110,9 +118,7 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   void _onSandwichTypeChanged(SandwichType? value) {
-    if (value != null) {
-      setState(() => _selectedSandwichType = value);
-    }
+    if (value != null) setState(() => _selectedSandwichType = value);
   }
 
   void _onSizeChanged(bool value) {
@@ -120,9 +126,7 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   void _onBreadTypeChanged(BreadType? value) {
-    if (value != null) {
-      setState(() => _selectedBreadType = value);
-    }
+    if (value != null) setState(() => _selectedBreadType = value);
   }
 
   void _increaseQuantity() {
@@ -130,9 +134,7 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   void _decreaseQuantity() {
-    if (_quantity > 0) {
-      setState(() => _quantity--);
-    }
+    if (_quantity > 0) setState(() => _quantity--);
   }
 
   VoidCallback? _getDecreaseCallback() {
@@ -160,7 +162,6 @@ class _OrderScreenState extends State<OrderScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Sandwich type dropdown
               DropdownMenu<SandwichType>(
                 width: double.infinity,
                 label: const Text('Sandwich Type'),
@@ -171,7 +172,6 @@ class _OrderScreenState extends State<OrderScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Size switch
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -182,7 +182,6 @@ class _OrderScreenState extends State<OrderScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Bread type dropdown
               DropdownMenu<BreadType>(
                 width: double.infinity,
                 label: const Text('Bread Type'),
@@ -193,7 +192,6 @@ class _OrderScreenState extends State<OrderScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Quantity adjustment
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -211,7 +209,6 @@ class _OrderScreenState extends State<OrderScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Add to Cart CTA
               StyledButton(
                 onPressed: _getAddToCartCallback(),
                 icon: Icons.add_shopping_cart,
@@ -220,7 +217,7 @@ class _OrderScreenState extends State<OrderScreen> {
               ),
               const SizedBox(height: 20),
 
-              // NEW: Cart summary block
+              // --- CART SUMMARY ---
               Container(
                 padding: const EdgeInsets.all(14),
                 margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -246,7 +243,7 @@ class _OrderScreenState extends State<OrderScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Confirmation message from previous task
+              // --- AUTO-DISMISSING CONFIRMATION MESSAGE ---
               if (_uiConfirmationMessage.isNotEmpty)
                 Container(
                   padding: const EdgeInsets.all(12),
@@ -272,7 +269,7 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 }
 
-/// Styled button
+/// Styled Button
 class StyledButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final IconData icon;
