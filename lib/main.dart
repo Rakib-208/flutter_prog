@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_prog/views/app_styles.dart';
 import 'package:flutter_prog/repositories/order_repository.dart';
+import 'package:flutter_prog/repositories/pricing_repository.dart';
 
 // Added BreadType enum (fix for breadType errors)
 enum BreadType { white, wheat, multigrain, rye }
@@ -27,6 +28,8 @@ class OrderItemDisplay extends StatelessWidget {
   final BreadType breadType; // added
   final String orderNote; // added
   final bool isToasted; // added
+  final double price; // NEW: total price for current selection
+
   // Centralized reusable button styles
   static ButtonStyle _buildStyledButton({
     // renamed from _buildStyle
@@ -63,7 +66,7 @@ class OrderItemDisplay extends StatelessWidget {
 
   static final ButtonStyle addStyledButton = _buildStyledButton(
     // renamed
-    activeBg: Colors.green.shade800,
+    activeBg: Colors.green,
     activeFg: Colors.white,
     disabledBg: Colors.grey,
     disabledFg: Colors.black54,
@@ -92,6 +95,7 @@ class OrderItemDisplay extends StatelessWidget {
     required this.breadType,
     required this.orderNote,
     this.isToasted = false, // added default
+    required this.price, // NEW
   }); // changed to named params
 
   @override
@@ -103,7 +107,8 @@ class OrderItemDisplay extends StatelessWidget {
         Text('$quantity $itemType sandwich(es): $sandwiches'),
         Text('Bread: ${breadType.name}'),
         Text('Note: $orderNote'),
-        Text(isToasted ? 'Toasted' : 'Untoasted'), // replaced placeholder
+        Text(isToasted ? 'Toasted' : 'Untoasted'),
+        Text('Total Price: \$${price.toStringAsFixed(2)}'), // NEW
       ],
     );
   }
@@ -190,6 +195,13 @@ class _OrderScreenState extends State<OrderScreen> {
       noteForDisplay = _notesController.text;
     }
 
+    // NEW: Pricing calculation in real time
+    final pricing = PricingRepository();
+    final double currentPrice = pricing.calculatePrice(
+      quantity: _orderRepository.quantity,
+      sandwichType: sandwichType,
+    );
+
     return Scaffold(
       appBar: AppBar(title: const Text('Sandwich Counter', style: heading1)),
       body: Center(
@@ -202,6 +214,7 @@ class _OrderScreenState extends State<OrderScreen> {
               breadType: _selectedBreadType,
               orderNote: noteForDisplay,
               isToasted: _isToasted, // pass toasted state
+              price: currentPrice, // NEW: pass the calculated price
             ),
             const SizedBox(height: 20),
             Row(
@@ -217,7 +230,7 @@ class _OrderScreenState extends State<OrderScreen> {
               ],
             ),
             Row(
-              //toast
+              // toast
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text('untoasted', style: normalText),
@@ -243,7 +256,7 @@ class _OrderScreenState extends State<OrderScreen> {
                 key: const Key('notes_textfield'),
                 controller: _notesController,
                 decoration: const InputDecoration(
-                  labelText: 'Add a note (e.g., no onions)',
+                  labelText: 'Add a note (e.g. no onions)',
                 ),
               ),
             ),
