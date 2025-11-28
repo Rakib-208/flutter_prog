@@ -34,7 +34,7 @@ class _OrderScreenState extends State<OrderScreen> {
   BreadType _selectedBreadType = BreadType.white;
   int _quantity = 1;
 
-  // NEW: field to store UI confirmation text
+  // Stores the confirmation message previously added
   String _uiConfirmationMessage = "";
 
   @override
@@ -65,13 +65,11 @@ class _OrderScreenState extends State<OrderScreen> {
 
       String sizeText = _isFootlong ? 'footlong' : 'six-inch';
 
-      // Build confirmation text
       String confirmationMessage =
           'Added $_quantity $sizeText ${sandwich.name} sandwich(es) on ${_selectedBreadType.name} bread to cart';
 
-      // Instead of only debugPrint(), update UI state
       setState(() {
-        _uiConfirmationMessage = confirmationMessage;
+        _uiConfirmationMessage = confirmationMessage; // update UI
       });
 
       debugPrint(confirmationMessage);
@@ -79,39 +77,27 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   VoidCallback? _getAddToCartCallback() {
-    if (_quantity > 0) {
-      return _addToCart;
-    }
-    return null;
+    return _quantity > 0 ? _addToCart : null;
   }
 
   List<DropdownMenuEntry<SandwichType>> _buildSandwichTypeEntries() {
-    List<DropdownMenuEntry<SandwichType>> entries = [];
-    for (SandwichType type in SandwichType.values) {
+    return SandwichType.values.map((type) {
       Sandwich sandwich = Sandwich(
         type: type,
         isFootlong: true,
         breadType: BreadType.white,
       );
-      DropdownMenuEntry<SandwichType> entry = DropdownMenuEntry<SandwichType>(
-        value: type,
-        label: sandwich.name,
-      );
-      entries.add(entry);
-    }
-    return entries;
+      return DropdownMenuEntry<SandwichType>(value: type, label: sandwich.name);
+    }).toList();
   }
 
   List<DropdownMenuEntry<BreadType>> _buildBreadTypeEntries() {
-    List<DropdownMenuEntry<BreadType>> entries = [];
-    for (BreadType bread in BreadType.values) {
-      DropdownMenuEntry<BreadType> entry = DropdownMenuEntry<BreadType>(
-        value: bread,
-        label: bread.name,
-      );
-      entries.add(entry);
-    }
-    return entries;
+    return BreadType.values
+        .map(
+          (bread) =>
+              DropdownMenuEntry<BreadType>(value: bread, label: bread.name),
+        )
+        .toList();
   }
 
   String _getCurrentImagePath() {
@@ -125,45 +111,32 @@ class _OrderScreenState extends State<OrderScreen> {
 
   void _onSandwichTypeChanged(SandwichType? value) {
     if (value != null) {
-      setState(() {
-        _selectedSandwichType = value;
-      });
+      setState(() => _selectedSandwichType = value);
     }
   }
 
   void _onSizeChanged(bool value) {
-    setState(() {
-      _isFootlong = value;
-    });
+    setState(() => _isFootlong = value);
   }
 
   void _onBreadTypeChanged(BreadType? value) {
     if (value != null) {
-      setState(() {
-        _selectedBreadType = value;
-      });
+      setState(() => _selectedBreadType = value);
     }
   }
 
   void _increaseQuantity() {
-    setState(() {
-      _quantity++;
-    });
+    setState(() => _quantity++);
   }
 
   void _decreaseQuantity() {
     if (_quantity > 0) {
-      setState(() {
-        _quantity--;
-      });
+      setState(() => _quantity--);
     }
   }
 
   VoidCallback? _getDecreaseCallback() {
-    if (_quantity > 0) {
-      return _decreaseQuantity;
-    }
-    return null;
+    return _quantity > 0 ? _decreaseQuantity : null;
   }
 
   @override
@@ -175,17 +148,14 @@ class _OrderScreenState extends State<OrderScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Image
               SizedBox(
                 height: 300,
                 child: Image.asset(
                   _getCurrentImagePath(),
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Center(
-                      child: Text('Image not found', style: normalText),
-                    );
-                  },
+                  errorBuilder: (_, __, ___) => const Center(
+                    child: Text('Image not found', style: normalText),
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
@@ -212,7 +182,7 @@ class _OrderScreenState extends State<OrderScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Bread dropdown
+              // Bread type dropdown
               DropdownMenu<BreadType>(
                 width: double.infinity,
                 label: const Text('Bread Type'),
@@ -223,7 +193,7 @@ class _OrderScreenState extends State<OrderScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Quantity row
+              // Quantity adjustment
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -241,7 +211,7 @@ class _OrderScreenState extends State<OrderScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Add-to-cart button
+              // Add to Cart CTA
               StyledButton(
                 onPressed: _getAddToCartCallback(),
                 icon: Icons.add_shopping_cart,
@@ -250,7 +220,33 @@ class _OrderScreenState extends State<OrderScreen> {
               ),
               const SizedBox(height: 20),
 
-              // NEW: UI confirmation message
+              // NEW: Cart summary block
+              Container(
+                padding: const EdgeInsets.all(14),
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.blue.shade300),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      'Cart Summary',
+                      style: heading2.copyWith(color: Colors.blue.shade700),
+                    ),
+                    const SizedBox(height: 8),
+                    Text('Items: ${_cart.totalQuantity}', style: normalText),
+                    Text(
+                      'Total Price: £${_cart.totalPrice.toStringAsFixed(2)}',
+                      style: normalText,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Confirmation message from previous task
               if (_uiConfirmationMessage.isNotEmpty)
                 Container(
                   padding: const EdgeInsets.all(12),
@@ -276,7 +272,7 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 }
 
-/// Styled Button
+/// Styled button
 class StyledButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final IconData icon;
