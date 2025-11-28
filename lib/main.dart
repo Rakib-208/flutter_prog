@@ -34,6 +34,9 @@ class _OrderScreenState extends State<OrderScreen> {
   BreadType _selectedBreadType = BreadType.white;
   int _quantity = 1;
 
+  // NEW: field to store UI confirmation text
+  String _uiConfirmationMessage = "";
+
   @override
   void initState() {
     super.initState();
@@ -57,18 +60,19 @@ class _OrderScreenState extends State<OrderScreen> {
       );
 
       setState(() {
-        // Cart API: add(Sandwich sandwich, {int quantity = 1})
         _cart.add(sandwich, quantity: _quantity);
       });
 
-      String sizeText;
-      if (_isFootlong) {
-        sizeText = 'footlong';
-      } else {
-        sizeText = 'six-inch';
-      }
+      String sizeText = _isFootlong ? 'footlong' : 'six-inch';
+
+      // Build confirmation text
       String confirmationMessage =
           'Added $_quantity $sizeText ${sandwich.name} sandwich(es) on ${_selectedBreadType.name} bread to cart';
+
+      // Instead of only debugPrint(), update UI state
+      setState(() {
+        _uiConfirmationMessage = confirmationMessage;
+      });
 
       debugPrint(confirmationMessage);
     }
@@ -171,6 +175,7 @@ class _OrderScreenState extends State<OrderScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // Image
               SizedBox(
                 height: 300,
                 child: Image.asset(
@@ -184,6 +189,8 @@ class _OrderScreenState extends State<OrderScreen> {
                 ),
               ),
               const SizedBox(height: 20),
+
+              // Sandwich type dropdown
               DropdownMenu<SandwichType>(
                 width: double.infinity,
                 label: const Text('Sandwich Type'),
@@ -193,6 +200,8 @@ class _OrderScreenState extends State<OrderScreen> {
                 dropdownMenuEntries: _buildSandwichTypeEntries(),
               ),
               const SizedBox(height: 20),
+
+              // Size switch
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -202,6 +211,8 @@ class _OrderScreenState extends State<OrderScreen> {
                 ],
               ),
               const SizedBox(height: 20),
+
+              // Bread dropdown
               DropdownMenu<BreadType>(
                 width: double.infinity,
                 label: const Text('Bread Type'),
@@ -211,6 +222,8 @@ class _OrderScreenState extends State<OrderScreen> {
                 dropdownMenuEntries: _buildBreadTypeEntries(),
               ),
               const SizedBox(height: 20),
+
+              // Quantity row
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -227,12 +240,33 @@ class _OrderScreenState extends State<OrderScreen> {
                 ],
               ),
               const SizedBox(height: 20),
+
+              // Add-to-cart button
               StyledButton(
                 onPressed: _getAddToCartCallback(),
                 icon: Icons.add_shopping_cart,
                 label: 'Add to Cart',
                 backgroundColor: Colors.green,
               ),
+              const SizedBox(height: 20),
+
+              // NEW: UI confirmation message
+              if (_uiConfirmationMessage.isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.green.shade100,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.green.shade700),
+                  ),
+                  child: Text(
+                    _uiConfirmationMessage,
+                    style: normalText.copyWith(color: Colors.green.shade900),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+
               const SizedBox(height: 20),
             ],
           ),
@@ -242,7 +276,7 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 }
 
-/// Simple styled button reused in the UI.
+/// Styled Button
 class StyledButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final IconData icon;
