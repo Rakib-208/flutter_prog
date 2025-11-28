@@ -6,8 +6,10 @@ class CartItem {
   final Sandwich sandwich;
   int quantity;
 
-  CartItem({required this.sandwich, this.quantity = 1})
-    : assert(quantity >= 0, 'Quantity cannot be negative.');
+  CartItem({
+    required this.sandwich,
+    this.quantity = 1,
+  }) : assert(quantity >= 0, 'Quantity cannot be negative.');
 
   /// Helper: whether this line corresponds to the exact same sandwich
   /// configuration (type + size + bread).
@@ -27,7 +29,7 @@ class Cart {
   final List<CartItem> _items = [];
 
   Cart({PricingRepository? pricingRepository})
-    : _pricingRepository = pricingRepository ?? PricingRepository();
+      : _pricingRepository = pricingRepository ?? PricingRepository();
 
   /// Read-only view of cart items.
   List<CartItem> get items => List.unmodifiable(_items);
@@ -58,7 +60,7 @@ class Cart {
   ///
   /// If the same sandwich (same type, size, bread) already exists,
   /// its quantity is incremented. Otherwise a new line is created.
-  void addSandwich(Sandwich sandwich, {int quantity = 1}) {
+  void add(Sandwich sandwich, {int quantity = 1}) {
     if (quantity <= 0) return;
 
     final int existingIndex = _indexOfSandwich(sandwich);
@@ -67,6 +69,11 @@ class Cart {
     } else {
       _items.add(CartItem(sandwich: sandwich, quantity: quantity));
     }
+  }
+
+  /// Backwards-compatible alias if you still call addSandwich elsewhere.
+  void addSandwich(Sandwich sandwich, {int quantity = 1}) {
+    add(sandwich, quantity: quantity);
   }
 
   /// Sets the quantity of [sandwich] to [quantity].
