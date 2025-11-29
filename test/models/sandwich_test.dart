@@ -49,7 +49,7 @@ void main() {
       );
       expect(
         sandwich.image,
-        'assets/images/${SandwichType.veggieDelight.name}_footlong.png',
+        'assets/images/${SandwichType.veggieDelight.name}_footlong.jpeg',
       );
     });
 
@@ -61,7 +61,7 @@ void main() {
       );
       expect(
         sandwich.image,
-        'assets/images/${SandwichType.chickenTeriyaki.name}_six_inch.png',
+        'assets/images/${SandwichType.chickenTeriyaki.name}_six_inch.jpeg',
       );
     });
 
@@ -73,7 +73,7 @@ void main() {
       );
       expect(
         sandwich.image,
-        'assets/images/${SandwichType.tunaMelt.name}_six_inch.png',
+        'assets/images/${SandwichType.tunaMelt.name}_six_inch.jpeg',
       );
     });
 
@@ -85,7 +85,7 @@ void main() {
       );
       expect(
         sandwich.image,
-        'assets/images/${SandwichType.meatballMarinara.name}_footlong.png',
+        'assets/images/${SandwichType.meatballMarinara.name}_footlong.jpeg',
       );
     });
   });
