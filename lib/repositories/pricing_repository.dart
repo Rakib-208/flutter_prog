@@ -1,6 +1,13 @@
 class PricingRepository {
   double calculatePrice({required int quantity, required bool isFootlong}) {
-    final double pricePerItem = isFootlong ? 11.00 : 7.00;
-    return quantity * pricePerItem;
+    double price = 0.0;
+
+    if (isFootlong) {
+      price = 11.00;
+    } else {
+      price = 7.00;
+    }
+
+    return quantity * price;
   }
 }

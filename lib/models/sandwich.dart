@@ -34,6 +34,6 @@ class Sandwich {
     } else {
       sizeString = 'six_inch';
     }
-    return 'assets/images/${typeString}_$sizeString.jpeg';
+    return 'assets/images/${typeString}_$sizeString.png';
   }
 }
